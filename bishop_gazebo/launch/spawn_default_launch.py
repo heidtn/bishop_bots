@@ -5,13 +5,22 @@ from launch.actions import DeclareLaunchArgument, ExecuteProcess
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from scripts import GazeboRosPaths
+
 
 
 def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
-    urdf_file_name = 'urdf/camera_bot.xacro'
+    urdf_file_name = 'models/station.sdf'
     world_name = 'launch/default_world.world'
+
+    model_path, plugin_path, media_path = GazeboRosPaths.get_paths()
+
+    env = {
+        "GAZEBO_MODEL_PATH": model_path,
+    }
+
 
     print("urdf_file_name : {}".format(urdf_file_name))
 
@@ -33,15 +42,17 @@ def generate_launch_description():
 
         ExecuteProcess(
             cmd=['gazebo', '--verbose', '-s', 'libgazebo_ros_factory.so', world],
-            output='screen'),
+            output='screen',
+            additional_env=env,
+            ),
 
-        # Node(
-        #    package='robot_state_publisher',
-        #    executable='robot_state_publisher',
-        #    name='robot_state_publisher',
-        #    output='screen',
-        #    parameters=[{'use_sim_time': use_sim_time}],
-        #    arguments=[urdf]),
+        #Node(
+        #   package='robot_state_publisher',
+        #   executable='robot_state_publisher',
+        #   name='robot_state_publisher',
+        #   output='screen',
+        #   parameters=[{'use_sim_time': use_sim_time}],
+        #   arguments=[urdf]),
 
         # Node(
         #    package='joint_state_publisher',
@@ -51,10 +62,10 @@ def generate_launch_description():
         #    parameters=[{'use_sim_time': use_sim_time}]
         #    ),
 
-        # Node(
-        #    package='gazebo_ros',
-        #    executable='spawn_entity.py',
-        #    name='urdf_spawner',
-        #    output='screen',
-        #    arguments=["-topic", "/robot_description", "-entity", "cam_bot"])
+        Node(
+           package='gazebo_ros',
+           executable='spawn_entity.py',
+           name='urdf_spawner',
+           output='screen',
+           arguments=["-entity", "station", "-file", urdf])
     ])

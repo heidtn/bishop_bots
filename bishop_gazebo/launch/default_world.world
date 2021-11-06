@@ -27,7 +27,7 @@
     </physics>
     <scene>
       <ambient>0.4 0.4 0.4 1</ambient>
-      <background>0.0 0.0 0.0 1</background>
+      <background>0 0 0 1</background>
       <shadows>1</shadows>
     </scene>
     <wind/>
@@ -39,20 +39,21 @@
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
     <state world_name='default'>
-      <sim_time>195 716000000</sim_time>
-      <real_time>37 897789607</real_time>
-      <wall_time>1636227127 980001433</wall_time>
-      <iterations>37739</iterations>
+      <sim_time>242 250000000</sim_time>
+      <real_time>46 724834990</real_time>
+      <wall_time>1636229767 200396660</wall_time>
+      <iterations>46534</iterations>
       <light name='sun'>
         <pose>0 0 10 0 -0 0</pose>
       </light>
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose>41.2393 -31.627 19.2773 -0 0.259642 2.42819</pose>
+        <pose>41.24 -31.6276 19.2736 -0 0.259642 2.42819</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
     </gui>
+    <atmosphere type='adiabatic'/>
   </world>
 </sdf>
