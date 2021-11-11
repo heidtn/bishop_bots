@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<robot name="construction_bot">
+  <static>false</static>
+  <link name="base_link">
+  </link>
+
+  <link name="body">
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="0.083" ixy="0.0" ixz="0.0" iyy="0.083" iyz="0.0" izz="0.083" />
+    </inertial>
+    <collision name="collision">
+      <geometry>
+        <box size="1 1 2"/>
+      </geometry>
+    </collision>
+    <visual name="visual">
+      <geometry>
+        <box size="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="dummy" type="fixed">
+    <parent link="base_link"/>
+    <child link="body"/>
+  </joint>
+
+  <gazebo>
+  <plugin name="robot_groundtruth_sim" filename="libgazebo_ros_p3d.so">
+    <always_on>true</always_on>
+    <update_rate>100.0</update_rate>
+    <body_name>base_link</body_name>
+    <topic_name>odom</topic_name>
+    <gaussianNoise>0.0</gaussianNoise>
+    <frame_name>map</frame_name>
+    <xyzOffsets>0 0 0</xyzOffsets>
+    <rpyOffsets>0 0 0</rpyOffsets>
+  </plugin>
+
+  <plugin name="gazebo_ros_force" filename="libgazebo_ros_force.so">
+    <ros>
+      <!-- Add namespace and remap the default topic -->
+      <namespace>/construction_bot</namespace>
+    </ros>
+
+    <!-- Replace camelCase elements with camel_case ones -->
+    <link_name>base_link</link_name>
+
+    <!-- New elements -->
+    <force_frame>world</force_frame>
+
+  </plugin>
+  </gazebo>
+
+</robot>
