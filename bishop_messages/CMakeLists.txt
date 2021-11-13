@@ -21,7 +21,8 @@ find_package(nav_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "actions/FollowPath.action"
+  "action/FollowPath.action"
+  DEPENDENCIES builtin_interfaces geometry_msgs std_msgs nav_msgs
 )
 
 if(BUILD_TESTING)
@@ -35,4 +36,5 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
+ament_export_dependencies(rosidl_default_runtime)
 ament_package()

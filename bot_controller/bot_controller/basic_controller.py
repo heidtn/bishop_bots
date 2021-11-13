@@ -1,5 +1,8 @@
 import rclpy
+from rclpy import executors
 from rclpy.node import Node
+from rclpy.callback_groups import MutuallyExclusiveCallbackGroup
+from rclpy.executors import MultiThreadedExecutor
 
 from std_msgs.msg import String, Header
 from nav_msgs.msg import Odometry, Path
@@ -17,15 +20,18 @@ class ADCSNode(Node):
     """
 
     def __init__(self):
-        super().__init__('minimal_subscriber')
+        super().__init__('bot_controller_node')
+        message_group = MutuallyExclusiveCallbackGroup()
         self.subscription = self.create_subscription(
             Odometry,
             'odom',
             self.listener_callback,
-            10)
+            10,
+            callback_group=message_group)
 
-        self.effort_publisher = self.create_publisher(Wrench, '/construction_bot/gazebo_ros_force', 10)
-        self._path_server = ActionServer(self, FollowPath, "follow_path", self.follow_path_callback)
+        self.effort_publisher = self.create_publisher(Wrench, '/construction_bot/gazebo_ros_force', 10, callback_group=message_group)
+        server_group = MutuallyExclusiveCallbackGroup()
+        self._path_server = ActionServer(self, FollowPath, "follow_path", self.follow_path_callback, callback_group=server_group)
 
         self.goal_position = None
         self.Kp = 0.1
@@ -39,7 +45,8 @@ class ADCSNode(Node):
         for point in path.poses[1:]:
             self.goto_point(start_point, point)
             start_point = point
-        result = goal_handle.Result()
+        result = FollowPath.Result()
+        result.completed = True
         return result
 
     def stamp_to_seconds(self, stamp):
@@ -52,15 +59,18 @@ class ADCSNode(Node):
 
     def goto_point(self, point1: PoseStamped, point2: PoseStamped):
         total_time = self.time_between_headers(point1.header, point2.header)
-        while self.get_clock().now() < point2.header.stamp:
+        while self.stamp_to_seconds(self.get_clock().now().to_msg()) < self.stamp_to_seconds(point2.header.stamp):
             curtime = self.get_clock().now()
-            time_since_start = self.time_between_headers(point1.header, curtime.to_msg())
+            dummy_header = Header()
+            dummy_header.stamp = curtime.to_msg()
+            time_since_start = self.time_between_headers(point1.header, dummy_header)
             scale_factor = time_since_start / total_time
             p1 = point1.pose.position
             p1 = np.array([p1.x, p1.y, p1.z])
             p2 = point2.pose.position
             p2 = np.array([p2.x, p2.y, p2.z])
             self.goal_position = (p2 - p1)*scale_factor + p1
+            print(f"goal is from {p1} to {p2} while at {self.goal_position}")
 
     def set_goal_position(self, goal):
         self.goal_position = goal
@@ -96,14 +106,12 @@ class ADCSNode(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_subscriber = ADCSNode()
-
-    rclpy.spin(minimal_subscriber)
-
-    # Destroy the node explicitly
-    # (optional - otherwise it will be done automatically
-    # when the garbage collector destroys the node object)
-    minimal_subscriber.destroy_node()
+    node = ADCSNode()
+    executor = MultiThreadedExecutor(num_threads=4)
+    executor.add_node(node)
+    executor.spin()
+    executor.shutdown()
+    node.destroy_node()
     rclpy.shutdown()
 
 

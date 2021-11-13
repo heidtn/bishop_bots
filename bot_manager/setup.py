@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'bot_controller'
+package_name = 'bot_manager'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'basic_controller = bot_controller.basic_controller:main',
+            'basic_test = bot_manager.quick_test:main',
         ],
     },
 )

@@ -89,5 +89,12 @@ def generate_launch_description():
            executable='spawn_entity.py',
            name='urdf_spawner',
            output='screen',
-           arguments=["-entity", "construction_bot", "-file", bot_urdf, '-z', '15.0'])
+           arguments=["-entity", "construction_bot", "-file", bot_urdf, '-z', '15.0']),
+
+        #Node(
+        #    package='bot_controller',
+        #    executable='basic_controller',
+        #    name='basic_controller',
+        #    output='screen'
+        #)
     ])
