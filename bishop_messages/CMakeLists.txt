@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(bishop_gazebo)
+project(bishop_messages)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -17,38 +17,12 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
-# Gazebo plugin includes
-find_package(gazebo REQUIRED)
-include_directories(${GAZEBO_INCLUDE_DIRS})
-link_directories(${GAZEBO_LIBRARY_DIRS})
-list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
-
-add_library(hello_world SHARED plugins/hello_world.cc)
-target_link_libraries(hello_world ${GAZEBO_LIBRARIES})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
-
-install(
-  TARGETS hello_world
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-  RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "actions/FollowPath.action"
 )
-
-install(DIRECTORY
-  launch
-  DESTINATION share/${PROJECT_NAME}
-)
-
-install(DIRECTORY
-  models
-  DESTINATION share/${PROJECT_NAME}
-)
-
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

@@ -20,6 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'basic_controller = bot_controller.basic_controller:main',
+
         ],
     },
 )
