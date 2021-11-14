@@ -21,6 +21,7 @@ class ADCSNode(Node):
 
     def __init__(self):
         super().__init__('bot_controller_node')
+        self.get_logger().info(f"Starting bot with namespace {self.get_namespace()}")
         message_group = MutuallyExclusiveCallbackGroup()
         self.subscription = self.create_subscription(
             Odometry,
@@ -29,9 +30,10 @@ class ADCSNode(Node):
             10,
             callback_group=message_group)
 
-        self.effort_publisher = self.create_publisher(Wrench, '/construction_bot/gazebo_ros_force', 10, callback_group=message_group)
+        self.effort_publisher = self.create_publisher(Wrench, 'gazebo_ros_force', 10, callback_group=message_group)
         server_group = MutuallyExclusiveCallbackGroup()
         self._path_server = ActionServer(self, FollowPath, "follow_path", self.follow_path_callback, callback_group=server_group)
+        
 
         self.goal_position = None
         self.Kp = 0.1
@@ -70,7 +72,6 @@ class ADCSNode(Node):
             p2 = point2.pose.position
             p2 = np.array([p2.x, p2.y, p2.z])
             self.goal_position = (p2 - p1)*scale_factor + p1
-            print(f"goal is from {p1} to {p2} while at {self.goal_position}")
 
     def set_goal_position(self, goal):
         self.goal_position = goal

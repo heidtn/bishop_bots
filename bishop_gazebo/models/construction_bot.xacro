@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<robot name="construction_bot">
+<robot name="construction_bot"
+  xmlns:xacro="http://www.ros.org/wiki/xacro">
   <static>false</static>
   <link name="base_link">
   </link>
@@ -27,30 +28,34 @@
   </joint>
 
   <gazebo>
-  <plugin name="robot_groundtruth_sim" filename="libgazebo_ros_p3d.so">
-    <always_on>true</always_on>
-    <update_rate>100.0</update_rate>
-    <body_name>base_link</body_name>
-    <topic_name>odom</topic_name>
-    <gaussianNoise>0.0</gaussianNoise>
-    <frame_name>map</frame_name>
-    <xyzOffsets>0 0 0</xyzOffsets>
-    <rpyOffsets>0 0 0</rpyOffsets>
-  </plugin>
+    <plugin name="robot_groundtruth_sim" filename="libgazebo_ros_p3d.so">
+      <ros>
+        <namespace>$(arg namespace)</namespace>
+        <remapping>odom:=odom</remapping>
+      </ros>
 
-  <plugin name="gazebo_ros_force" filename="libgazebo_ros_force.so">
-    <ros>
-      <!-- Add namespace and remap the default topic -->
-      <namespace>/construction_bot</namespace>
-    </ros>
+      <always_on>true</always_on>
+      <update_rate>100.0</update_rate>
+      <body_name>base_link</body_name>
+      <gaussianNoise>0.0</gaussianNoise>
+      <frame_name>map</frame_name>
+      <xyzOffsets>0 0 0</xyzOffsets>
+      <rpyOffsets>0 0 0</rpyOffsets>
+    </plugin>
 
-    <!-- Replace camelCase elements with camel_case ones -->
-    <link_name>base_link</link_name>
+    <plugin name="gazebo_ros_force" filename="libgazebo_ros_force.so">
+      <ros>
+        <!-- Add namespace and remap the default topic -->
+        <namespace>$(arg namespace)</namespace>
+      </ros>
 
-    <!-- New elements -->
-    <force_frame>world</force_frame>
+      <!-- Replace camelCase elements with camel_case ones -->
+      <link_name>base_link</link_name>
 
-  </plugin>
+      <!-- New elements -->
+      <force_frame>world</force_frame>
+
+    </plugin>
   </gazebo>
 
 </robot>
