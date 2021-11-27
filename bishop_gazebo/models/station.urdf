@@ -1,27 +1,20 @@
 <?xml version="1.0"?>
 <robot name="station">
-    <pose>0 0 0.0 0 0 0</pose>
-    <link name="body">
-      <inertial>
-        <mass value="1000.0"/>
-        <inertia
-           ixx="0.083"
-           ixy="0.0"     
-           ixz="0.0"
-           iyy="0.083"       
-           iyz="0.0"         
-           izz="0.083"       
-         />
-      </inertial>
-      <collision name="collision">
-        <geometry>
-          <mesh filename="model://models/station.dae"/>
-        </geometry>
-      </collision>
-      <visual name="visual">
-        <geometry>
-          <mesh filename="model://models/station.dae"/>
-        </geometry>
-      </visual>
-    </link>
+  <pose>0 0 0.0 0 0 0</pose>
+  <link name="body">
+    <inertial>
+      <mass value="1000.0"/>
+      <inertia ixx="0.083" ixy="0.0" ixz="0.0" iyy="0.083" iyz="0.0" izz="0.083" />
+    </inertial>
+    <collision name="collision">
+      <geometry>
+        <mesh filename="model://models/station.dae"/>
+      </geometry>
+    </collision>
+    <visual name="visual">
+      <geometry>
+        <mesh filename="model://models/station.dae"/>
+      </geometry>
+    </visual>
+  </link>
 </robot>

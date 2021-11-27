@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'basic_test = bot_manager.quick_test:main',
+            'basic_multiagent_test = bot_manager.basic_multiagent_test:main',
         ],
     },
 )

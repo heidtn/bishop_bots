@@ -38,17 +38,17 @@ def truss_link(mass, radius, height, origin, name):
 
     l = Link(
              Inertial(
-                 Origin(xyz=origin[:3], rpy=origin[3:]),  # TODO (HEIDT) this might be wrong way, check dox
                  Mass(value=mass),
-                 Inertia(**inertia)
+                 Inertia(**inertia),
+                 Origin(rpy=origin[3:]),  # TODO (HEIDT) this might be wrong way, check dox
              ),
              Visual(
-                 Origin(xyz=origin[:3], rpy=origin[3:]),
-                 Geometry(Cylinder(radius=radius, length=height))
+                 Geometry(Cylinder(radius=radius, length=height)),
+                 Origin(rpy=origin[3:]),
              ),
              Collision(
-                 Origin(xyz=origin[:3], rpy=origin[3:]),
-                 Geometry(Cylinder(radius=radius, length=height))
+                 Geometry(Cylinder(radius=radius, length=height)),
+                 Origin(rpy=origin[3:]),
              ),
              name=name,
         )
@@ -114,13 +114,14 @@ def cyl_link_from_points(point1, point2, mass, radius, name):
     length = np.linalg.norm(point2 - point1)
     rot_mat = rotation_matrix_from_points(point1, point2)
     r = R.from_matrix(rot_mat)
-    rpy = r.as_euler('xyz')
+    rpy = r.as_euler('xzy')
     full_origin = [*origin, *rpy]
-    return truss_link(mass, radius, length, full_origin, name), rpy
+    return truss_link(mass, radius, length, full_origin, name)
 
-def make_joint(parent, child, name, rpy):
+def make_joint(parent, child, name, offset):
     ret = Joint(Parent(link=parent),
                 Child(link=child),
+                Origin(xyz=offset.tolist()),
                 type="fixed",
                 name=name)
     return ret
@@ -167,20 +168,24 @@ def truss_oneill_cylinder(length: int, inner_radius: float, thickness: int,
                     #structure.add_truss((cur_index, index(i+1, j, k)))
                     truss_indices.append((cur_index, index(i+1, j, k)))
 
-    base_points = truss_indices[0]
-    p1 = node_points[base_points[0]]
-    p2 = node_points[base_points[1]]
-    base_link, rpy = cyl_link_from_points(p1, p2, link_mass, truss_radius, "base_link")
-    links.append(base_link)
-    for i, truss in enumerate(truss_indices[1:]):
+
+
+    l = Link(
+             name="base_link",
+        )
+
+    links.append(l)
+
+    for i, truss in enumerate(truss_indices):
         p1 = node_points[truss[0]]
         p2 = node_points[truss[1]]
-        link, rpy = cyl_link_from_points(p1, p2, link_mass, truss_radius, f"truss_{i}")
-        joint = make_joint("base_link", f"truss_{i}", f"truss_{i}_joint", rpy) 
+        offset = (p1 + p2)/2.0 
+        link = cyl_link_from_points(p1, p2, link_mass, truss_radius, f"truss_{i}")
+        joint = make_joint("base_link", f"truss_{i}", f"truss_{i}_joint", offset) 
         links.append(link)
         joints.append(joint)
     
     return Robot(*links, *joints, name="station")
 
 if __name__ == "__main__":
-    print(truss_oneill_cylinder(2, 10.0, 1, 3.0, 5.0, 0.05))
+    print(truss_oneill_cylinder(30, 20.0, 1, 3.5, 5.0, 0.05))

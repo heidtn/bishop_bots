@@ -21,7 +21,7 @@ class BotManagerTest(Node):
 
     def __init__(self):
         super().__init__('minimal_subscriber')
-        self._action_client = ActionClient(self, FollowPath, '/bot_0/follow_path')
+        self._action_client = ActionClient(self, FollowPath, '/bot_4/follow_path')
     
     def send_goal(self):
         goal_msg = FollowPath.Goal()

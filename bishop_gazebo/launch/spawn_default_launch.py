@@ -14,7 +14,7 @@ import numpy as np
 def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
-    station_urdf_file_name = 'models/station.urdf'
+    station_urdf_file_name = 'models/test_structure.urdf'
     bot_xacro_file_name = 'models/construction_bot.xacro'
     world_name = 'launch/default_world.world'
 
@@ -44,6 +44,8 @@ def generate_launch_description():
     NUM_BOTS = 10
     WIDTH = 5
     SPACING = 5.0
+    X_OFF = -5.0
+    Y_OFF = -5.0
     for i in range(NUM_BOTS):
         bot_urdf_doc = xacro.process_file(bot_xacro, mappings={"namespace": f"bot_{i}"})
         bot_urdf = bot_urdf_doc.toxml()
@@ -51,8 +53,8 @@ def generate_launch_description():
         xacro_file_object.write(bot_urdf.encode("ascii"))
         bot_urdf = xacro_file_object.name
 
-        x = str((i % WIDTH)*SPACING)
-        y = str((i // WIDTH)*SPACING)
+        x = str((i % WIDTH)*SPACING + X_OFF)
+        y = str((i // WIDTH)*SPACING + Y_OFF)
         
         bot_nodes.append(Node(
            package='gazebo_ros',
@@ -80,7 +82,6 @@ def generate_launch_description():
         get_package_share_directory('bishop_gazebo'),
         world_name 
     )
-
     return LaunchDescription([
 
         DeclareLaunchArgument(
